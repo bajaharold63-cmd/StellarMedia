@@ -322,14 +322,10 @@ document.addEventListener('DOMContentLoaded', () => {
         if (!track || !container) return;
 
         const items = Array.from(track.querySelectorAll('.carousel-item-3d'));
-        const itemCount = items.length;
-        const anglePerItem = 360 / itemCount;
-        const radius = window.innerWidth > 768 ? 420 : 240;
 
-        items.forEach((item, index) => {
-            const angle = index * anglePerItem;
-            item.style.transform = `rotateY(${angle}deg) translateZ(${radius}px)`;
-
+        // Click-to-sample works the same on phone and desktop, so wire it up
+        // no matter which layout is active below.
+        items.forEach((item) => {
             const sampleIndex = parseInt(item.getAttribute('data-sample-index'), 10);
             const sample = VIDEO_SAMPLES[sampleIndex];
             if (sample) {
@@ -338,6 +334,23 @@ document.addEventListener('DOMContentLoaded', () => {
                     openDetailView(item, sample, true);
                 });
             }
+        });
+
+        // On phones, stop right here. CSS lays these same cards out as a
+        // plain stacked list on narrow screens (see the @media block in
+        // style.css), so there is no 3D rotation to set up — the cards
+        // just sit in normal document flow and the page scrolls normally.
+        const isMobileLayout = window.matchMedia('(max-width: 768px)').matches;
+        if (isMobileLayout) return;
+
+        // ---- Everything below this line only runs on wider (desktop/laptop) screens ----
+        const itemCount = items.length;
+        const anglePerItem = 360 / itemCount;
+        const radius = 420;
+
+        items.forEach((item, index) => {
+            const angle = index * anglePerItem;
+            item.style.transform = `rotateY(${angle}deg) translateZ(${radius}px)`;
         });
 
         let rotationY = 0;
