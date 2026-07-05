@@ -1174,13 +1174,32 @@ footer {
         max-width: 100%;
     }
 
-    /* Shrink the 3D carousel stage for mobile */
+    /* On phones, swap the 3D carousel for a plain stacked list of the same
+       cards. There's no room (or mouse cursor) for the orbit effect on a
+       narrow portrait screen, so instead of shrinking it, we turn it off:
+       script.js also checks this same 768px breakpoint and skips the
+       rotation engine entirely when it matches. */
     .carousel-container-3d {
-        height: 400px;
+        height: auto;
+        perspective: none;      /* no more 3D depth on mobile */
+        display: block;
     }
-    .carousel-track-3d,
+    .carousel-track-3d {
+        position: static;
+        width: 100%;
+        height: auto;
+        transform: none !important; /* overrides any transform script.js already set */
+        display: flex;
+        flex-direction: column;
+        gap: 18px;
+    }
     .carousel-item-3d {
-        width: 210px;
-        height: 300px;
+        position: static;            /* was: absolute, positioned by JS in 3D space */
+        width: 100%;
+        height: 240px;
+        transform: none !important; /* overrides each card's rotateY()/translateZ() */
+    }
+    .carousel-item-3d.is-front {
+        box-shadow: 0 20px 45px rgba(0, 0, 0, 0.55); /* drop the gold "front card" ring on mobile */
     }
 }
