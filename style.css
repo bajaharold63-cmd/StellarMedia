@@ -537,6 +537,7 @@ header {
     align-items: center;
     perspective: 1300px;
     margin: 0 auto;
+    touch-action: none; /* stops the phone from scrolling the page while swiping the carousel */
 }
 
 .carousel-track-3d {
@@ -547,22 +548,33 @@ header {
     /* Spin handled dynamically by script.js */
 }
 
+/* This outer element ONLY handles 3D position — no border-radius/overflow here.
+   Combining a 3D transform with overflow:hidden + border-radius on the SAME
+   element is what caused cards to render flattened/merged on mobile browsers.
+   The rounded corners, clipping, and shadow now live on .carousel-card-face
+   (a plain, non-transformed child) instead. */
 .carousel-item-3d {
     position: absolute;
     top: 0;
     left: 0;
     width: 280px;
     height: 380px;
-    border-radius: 14px;
-    overflow: hidden;
     cursor: pointer;
     backface-visibility: hidden;
+    will-change: transform;
+}
+
+.carousel-card-face {
+    position: absolute;
+    inset: 0;
+    border-radius: 14px;
+    overflow: hidden;
     box-shadow: 0 20px 45px rgba(0, 0, 0, 0.55);
     border: 1px solid rgba(245, 176, 0, 0.18);
     transition: box-shadow 0.3s ease;
 }
 
-.carousel-item-3d.is-front {
+.carousel-item-3d.is-front .carousel-card-face {
     box-shadow: 0 0 0 2px var(--primary-gold), 0 25px 55px rgba(0, 0, 0, 0.65);
 }
 
@@ -1174,32 +1186,16 @@ footer {
         max-width: 100%;
     }
 
-    /* On phones, swap the 3D carousel for a plain stacked list of the same
-       cards. There's no room (or mouse cursor) for the orbit effect on a
-       narrow portrait screen, so instead of shrinking it, we turn it off:
-       script.js also checks this same 768px breakpoint and skips the
-       rotation engine entirely when it matches. */
+    /* Keep the real 3D carousel on phones too — just at a smaller scale.
+       A tighter perspective here keeps the depth feeling proportional to
+       the smaller radius script.js uses on narrow screens. */
     .carousel-container-3d {
-        height: auto;
-        perspective: none;      /* no more 3D depth on mobile */
-        display: block;
+        height: 400px;
+        perspective: 900px;
     }
-    .carousel-track-3d {
-        position: static;
-        width: 100%;
-        height: auto;
-        transform: none !important; /* overrides any transform script.js already set */
-        display: flex;
-        flex-direction: column;
-        gap: 18px;
-    }
+    .carousel-track-3d,
     .carousel-item-3d {
-        position: static;            /* was: absolute, positioned by JS in 3D space */
-        width: 100%;
-        height: 240px;
-        transform: none !important; /* overrides each card's rotateY()/translateZ() */
-    }
-    .carousel-item-3d.is-front {
-        box-shadow: 0 20px 45px rgba(0, 0, 0, 0.55); /* drop the gold "front card" ring on mobile */
+        width: 210px;
+        height: 300px;
     }
 }
