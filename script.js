@@ -323,8 +323,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
         const items = Array.from(track.querySelectorAll('.carousel-item-3d'));
 
-        // Click-to-sample works the same on phone and desktop, so wire it up
-        // no matter which layout is active below.
+        // Click-to-sample — works via click on desktop and via tap on mobile.
         items.forEach((item) => {
             const sampleIndex = parseInt(item.getAttribute('data-sample-index'), 10);
             const sample = VIDEO_SAMPLES[sampleIndex];
@@ -336,17 +335,9 @@ document.addEventListener('DOMContentLoaded', () => {
             }
         });
 
-        // On phones, stop right here. CSS lays these same cards out as a
-        // plain stacked list on narrow screens (see the @media block in
-        // style.css), so there is no 3D rotation to set up — the cards
-        // just sit in normal document flow and the page scrolls normally.
-        const isMobileLayout = window.matchMedia('(max-width: 768px)').matches;
-        if (isMobileLayout) return;
-
-        // ---- Everything below this line only runs on wider (desktop/laptop) screens ----
         const itemCount = items.length;
         const anglePerItem = 360 / itemCount;
-        const radius = 420;
+        const radius = window.innerWidth > 768 ? 420 : 240;
 
         items.forEach((item, index) => {
             const angle = index * anglePerItem;
